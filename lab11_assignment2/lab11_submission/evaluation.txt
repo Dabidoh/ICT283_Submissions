@@ -1,0 +1,13 @@
+Assignment 2 Progress Evaluation
+
+I have implemented the current Assignment 2 menu with options 1 to 4 and exit. The program builds and runs in Code::Blocks using C++11 warning settings. Option 3 has been updated to calculate the sample Pearson Correlation Coefficient (sPCC) for a user-specified month, as required. Option 4 has been updated to generate WindTempSolar.csv and now includes both sample standard deviation and mean absolute deviation (MAD).
+
+For data structures, I used a template BST and std::map. The BST is used to store unique dates and demonstrate the required tree structure from Lab 10. The std::map is used to group records by month, which supports the Assignment 2 month-based queries more naturally. Full weather observations are stored in WeatherLog, while unique dates are stored separately in the BST. I chose this design because it keeps main.cpp shorter and moves the application logic into WeatherLog. This is an improvement over my earlier Lab 8 design, where too much logic was placed directly in main.
+
+I have been keeping backups using Git and GitHub. I committed changes incrementally as I progressed through Lab 10 and Lab 11 so I can restore earlier working versions if needed. This also helps me demonstrate my work progression during in-person assessment.
+
+The current codebase includes separate unit tests for Date, Time, WeatherRecord, BST<Date>, DateTreeLoader, and WeatherLog. The application test is the main menu program. I also tested loading from data_source.txt, handling invalid months, no-data cases, and writing WindTempSolar.csv.
+
+One key lesson I learned is that reusing old code is helpful, but the old architecture should not always be copied directly. For Assignment 2, I reused useful logic from Lab 8, especially the calculations for averages, standard deviation, and CSV export, but refactored it into WeatherLog so the design is cleaner and easier to defend. I also changed the statistics helpers so they are no longer tightly coupled to WeatherRecord.
+
+Remaining work is mostly final checking, test plan documentation, and ensuring all outputs match the required assignment format exactly.
