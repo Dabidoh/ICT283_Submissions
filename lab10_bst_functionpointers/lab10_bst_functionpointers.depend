@@ -1,0 +1,28 @@
+# depslib dependency file v1.0
+1773579227 source:d:\downloads\ict283\lab10_bst_functionpointers\date.cpp
+	"Date.h"
+
+1773579199 d:\downloads\ict283\lab10_bst_functionpointers\date.h
+	<iostream>
+
+1773586232 source:d:\downloads\ict283\lab10_bst_functionpointers\datetreeloader.cpp
+	"DateTreeLoader.h"
+	<fstream>
+	<sstream>
+	<iostream>
+
+1773585827 d:\downloads\ict283\lab10_bst_functionpointers\datetreeloader.h
+	<string>
+	<iosfwd>
+	"Bst.h"
+	"Date.h"
+
+1773584941 d:\downloads\ict283\lab10_bst_functionpointers\bst.h
+	<iostream>
+
+1773582359 source:d:\downloads\ict283\lab10_bst_functionpointers\maindatedatasource.cpp
+	<iostream>
+	"Bst.h"
+	"Date.h"
+	"DateTreeLoader.h"
+
