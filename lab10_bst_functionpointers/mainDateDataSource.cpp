@@ -6,17 +6,22 @@
 using std::cout;
 using std::endl;
 
+void PrintDate(const Date& d)
+{
+    std::cout << d << ' ';
+}
+
 void TestByValue(Bst<Date> tree)
 {
     cout << "Pass-by-value inorder: ";
-    tree.InOrder();
+    tree.InOrder(PrintDate);
     cout << endl;
 }
 
 void TestByReference(const Bst<Date>& tree)
 {
     cout << "Pass-by-reference inorder: ";
-    tree.InOrder();
+    tree.InOrder(PrintDate);
     cout << endl;
 }
 
@@ -36,15 +41,15 @@ int main()
     cout << "Invalid rows: " << report.invalidRows << endl;
 
     cout << "\nInOrder (chronological): ";
-    dateTree.InOrder();
+    dateTree.InOrder(PrintDate);
     cout << endl;
 
     cout << "PreOrder: ";
-    dateTree.PreOrder();
+    dateTree.PreOrder(PrintDate);
     cout << endl;
 
     cout << "PostOrder: ";
-    dateTree.PostOrder();
+    dateTree.PostOrder(PrintDate);
     cout << endl;
 
     cout << "\nBST invariant holds: " << dateTree.CheckInvariant() << endl;
