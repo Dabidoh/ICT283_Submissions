@@ -1,12 +1,11 @@
-# Code::Blocks generated / build files
-*.depend
-*.layout
-*.cbp.save
-*.o
-*.obj
-*.exe
-*.gch
-
-# Build folders
-obj/
+# build files
 bin/
+obj/
+*.exe
+*.o
+*.out
+gmon.out
+
+# CodeBlocks
+*.layout
+*.depend
