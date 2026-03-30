@@ -97,6 +97,59 @@ namespace
         return (endPtr != cleaned.c_str() && *endPtr == '\0');
     }
 
+        double CalculateAverage(const std::vector<double>& values)
+    {
+        if (values.empty())
+        {
+            return 0.0;
+        }
+
+        double sum = 0.0;
+        for (std::size_t i = 0; i < values.size(); ++i)
+        {
+            sum += values[i];
+        }
+
+        return sum / static_cast<double>(values.size());
+    }
+
+    double CalculateStandardDeviation(const std::vector<double>& values)
+    {
+        if (values.size() <= 1)
+        {
+            return 0.0;
+        }
+
+        const double mean = CalculateAverage(values);
+        double sumSq = 0.0;
+
+        for (std::size_t i = 0; i < values.size(); ++i)
+        {
+            const double diff = values[i] - mean;
+            sumSq += diff * diff;
+        }
+
+        return std::sqrt(sumSq / static_cast<double>(values.size() - 1));
+    }
+
+    double CalculateMAD(const std::vector<double>& values)
+    {
+        if (values.empty())
+        {
+            return 0.0;
+        }
+
+        const double mean = CalculateAverage(values);
+        double sumAbs = 0.0;
+
+        for (std::size_t i = 0; i < values.size(); ++i)
+        {
+            sumAbs += std::fabs(values[i] - mean);
+        }
+
+        return sumAbs / static_cast<double>(values.size());
+    }
+
     double CalculatePearson(const std::vector<WeatherRecord>& records,
                             float (WeatherRecord::*getterX)() const,
                             float (WeatherRecord::*getterY)() const)
@@ -111,8 +164,10 @@ namespace
 
             // Exclude records where solar radiation has been zeroed out
             // for filtered/noise handling.
-            if ((getterX == &WeatherRecord::GetSolarRadiation && x == 0.0) ||
-                (getterY == &WeatherRecord::GetSolarRadiation && y == 0.0))
+            const double EPSILON = 0.000001;
+
+            if ((getterX == &WeatherRecord::GetSolarRadiation && std::fabs(x) < EPSILON) ||
+                (getterY == &WeatherRecord::GetSolarRadiation && std::fabs(y) < EPSILON))
             {
                 continue;
             }
@@ -371,4 +426,166 @@ double WeatherLog::CalculateCorrelationTR(int month) const
     return CalculatePearson(itr->second,
                             &WeatherRecord::GetTemperature,
                             &WeatherRecord::GetSolarRadiation);
+}
+
+std::vector<WeatherRecord> WeatherLog::GetRecordsForMonthYear(int month, int year) const
+{
+    std::vector<WeatherRecord> filtered;
+
+    for (std::size_t i = 0; i < m_records.size(); ++i)
+    {
+        if (m_records[i].GetDate().GetMonth() == month &&
+            m_records[i].GetDate().GetYear() == year)
+        {
+            filtered.push_back(m_records[i]);
+        }
+    }
+
+    return filtered;
+}
+
+double WeatherLog::CalculateAverageWindSpeed(int month, int year) const
+{
+    const std::vector<WeatherRecord> filtered = GetRecordsForMonthYear(month, year);
+    std::vector<double> values;
+
+    for (std::size_t i = 0; i < filtered.size(); ++i)
+    {
+        values.push_back(filtered[i].GetWindSpeed());
+    }
+
+    return CalculateAverage(values);
+}
+
+double WeatherLog::CalculateAverageTemperature(int month, int year) const
+{
+    const std::vector<WeatherRecord> filtered = GetRecordsForMonthYear(month, year);
+    std::vector<double> values;
+
+    for (std::size_t i = 0; i < filtered.size(); ++i)
+    {
+        values.push_back(filtered[i].GetTemperature());
+    }
+
+    return CalculateAverage(values);
+}
+
+double WeatherLog::CalculateWindSpeedStdev(int month, int year) const
+{
+    const std::vector<WeatherRecord> filtered = GetRecordsForMonthYear(month, year);
+    std::vector<double> values;
+
+    for (std::size_t i = 0; i < filtered.size(); ++i)
+    {
+        values.push_back(filtered[i].GetWindSpeed());
+    }
+
+    return CalculateStandardDeviation(values);
+}
+
+double WeatherLog::CalculateTemperatureStdev(int month, int year) const
+{
+    const std::vector<WeatherRecord> filtered = GetRecordsForMonthYear(month, year);
+    std::vector<double> values;
+
+    for (std::size_t i = 0; i < filtered.size(); ++i)
+    {
+        values.push_back(filtered[i].GetTemperature());
+    }
+
+    return CalculateStandardDeviation(values);
+}
+
+double WeatherLog::CalculateWindSpeedMAD(int month, int year) const
+{
+    const std::vector<WeatherRecord> filtered = GetRecordsForMonthYear(month, year);
+    std::vector<double> values;
+
+    for (std::size_t i = 0; i < filtered.size(); ++i)
+    {
+        values.push_back(filtered[i].GetWindSpeed());
+    }
+
+    return CalculateMAD(values);
+}
+
+double WeatherLog::CalculateTemperatureMAD(int month, int year) const
+{
+    const std::vector<WeatherRecord> filtered = GetRecordsForMonthYear(month, year);
+    std::vector<double> values;
+
+    for (std::size_t i = 0; i < filtered.size(); ++i)
+    {
+        values.push_back(filtered[i].GetTemperature());
+    }
+
+    return CalculateMAD(values);
+}
+
+double WeatherLog::CalculateTotalSolarRadiation(int month, int year) const
+{
+    const std::vector<WeatherRecord> filtered = GetRecordsForMonthYear(month, year);
+
+    double totalSolarW = 0.0;
+    for (std::size_t i = 0; i < filtered.size(); ++i)
+    {
+        totalSolarW += filtered[i].GetSolarRadiation();
+    }
+
+    return (totalSolarW * (1.0 / 6.0)) / 1000.0;
+}
+
+bool WeatherLog::WriteWindTempSolarFile(int year, const std::string& outFile) const
+{
+    std::ofstream out(outFile.c_str());
+    if (!out)
+    {
+        return false;
+    }
+
+    static const char* MONTH_NAMES[] =
+    {
+        "",
+        "January", "February", "March", "April",
+        "May", "June", "July", "August",
+        "September", "October", "November", "December"
+    };
+
+    out << year << "\n";
+
+    bool hasAnyData = false;
+
+    for (int month = 1; month <= 12; ++month)
+    {
+        const std::vector<WeatherRecord> filtered = GetRecordsForMonthYear(month, year);
+
+        if (filtered.empty())
+        {
+            continue;
+        }
+
+        hasAnyData = true;
+
+        const double avgWind = CalculateAverageWindSpeed(month, year);
+        const double stdevWind = CalculateWindSpeedStdev(month, year);
+        const double madWind = CalculateWindSpeedMAD(month, year);
+
+        const double avgTemp = CalculateAverageTemperature(month, year);
+        const double stdevTemp = CalculateTemperatureStdev(month, year);
+        const double madTemp = CalculateTemperatureMAD(month, year);
+
+        const double totalSolar = CalculateTotalSolarRadiation(month, year);
+
+        out << MONTH_NAMES[month] << ","
+            << avgWind << "(" << stdevWind << ", " << madWind << "),"
+            << avgTemp << "(" << stdevTemp << ", " << madTemp << "),"
+            << totalSolar << "\n";
+    }
+
+    if (!hasAnyData)
+    {
+        out << "No Data\n";
+    }
+
+    return true;
 }

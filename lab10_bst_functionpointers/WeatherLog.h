@@ -74,6 +74,87 @@ public:
      */
     double CalculateCorrelationTR(int month) const;
 
+    /**
+     * @brief Gets all records for a specified month and year.
+     *
+     * @param month Month number in the range 1 to 12.
+     * @param year The target year.
+     * @return Vector of matching weather records.
+     */
+    std::vector<WeatherRecord> GetRecordsForMonthYear(int month, int year) const;
+
+    /**
+     * @brief Calculates average wind speed for a specified month and year.
+     *
+     * @param month Month number in the range 1 to 12.
+     * @param year The target year.
+     * @return Average wind speed in km/h.
+     */
+    double CalculateAverageWindSpeed(int month, int year) const;
+
+    /**
+     * @brief Calculates average ambient temperature for a specified month and year.
+     *
+     * @param month Month number in the range 1 to 12.
+     * @param year The target year.
+     * @return Average ambient temperature.
+     */
+    double CalculateAverageTemperature(int month, int year) const;
+
+    /**
+     * @brief Calculates sample standard deviation of wind speed for a specified month and year.
+     *
+     * @param month Month number in the range 1 to 12.
+     * @param year The target year.
+     * @return Sample standard deviation of wind speed.
+     */
+    double CalculateWindSpeedStdev(int month, int year) const;
+
+    /**
+     * @brief Calculates sample standard deviation of temperature for a specified month and year.
+     *
+     * @param month Month number in the range 1 to 12.
+     * @param year The target year.
+     * @return Sample standard deviation of temperature.
+     */
+    double CalculateTemperatureStdev(int month, int year) const;
+
+    /**
+     * @brief Calculates mean absolute deviation of wind speed for a specified month and year.
+     *
+     * @param month Month number in the range 1 to 12.
+     * @param year The target year.
+     * @return Mean absolute deviation of wind speed.
+     */
+    double CalculateWindSpeedMAD(int month, int year) const;
+
+    /**
+     * @brief Calculates mean absolute deviation of temperature for a specified month and year.
+     *
+     * @param month Month number in the range 1 to 12.
+     * @param year The target year.
+     * @return Mean absolute deviation of temperature.
+     */
+    double CalculateTemperatureMAD(int month, int year) const;
+
+    /**
+     * @brief Calculates total solar radiation for a specified month and year.
+     *
+     * @param month Month number in the range 1 to 12.
+     * @param year The target year.
+     * @return Total solar radiation in kWh/m2.
+     */
+    double CalculateTotalSolarRadiation(int month, int year) const;
+
+    /**
+     * @brief Writes the WindTempSolar CSV output for a specified year.
+     *
+     * @param year The target year.
+     * @param outFile Output CSV filename.
+     * @return true if the file was written successfully, false otherwise.
+     */
+    bool WriteWindTempSolarFile(int year, const std::string& outFile) const;
+
 private:
     std::vector<WeatherRecord> m_records;
     std::map<int, std::vector<WeatherRecord> > m_recordsByMonth;
