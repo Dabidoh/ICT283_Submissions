@@ -5,17 +5,36 @@
 using std::cout;
 using std::endl;
 
+void PrintDate(const Date& d)
+{
+    cout << d << ' ';
+}
+
+int g_count = 0;
+
+void CountDate(const Date&)
+{
+    ++g_count;
+}
+
 void TestByValue(Bst<Date> tree)
 {
     cout << "Pass-by-value inorder: ";
-    tree.InOrder();
+    tree.InOrder(PrintDate);
     cout << endl;
 }
 
-void TestByReference(const Bst<Date>& tree)
+void TestByReference(Bst<Date>& tree)
 {
     cout << "Pass-by-reference inorder: ";
-    tree.InOrder();
+    tree.InOrder(PrintDate);
+    cout << endl;
+}
+
+void TestByConstReference(const Bst<Date>& tree)
+{
+    cout << "Pass-by-const-reference inorder: ";
+    tree.InOrder(PrintDate);
     cout << endl;
 }
 
@@ -41,15 +60,15 @@ int main()
     cout << "Insert d4 (expected 1): " << dateTree.Insert(d4) << endl;
 
     cout << "InOrder (expected chronological): ";
-    dateTree.InOrder();
+    dateTree.InOrder(PrintDate);
     cout << endl;
 
     cout << "PreOrder: ";
-    dateTree.PreOrder();
+    dateTree.PreOrder(PrintDate);
     cout << endl;
 
     cout << "PostOrder: ";
-    dateTree.PostOrder();
+    dateTree.PostOrder(PrintDate);
     cout << endl;
 
     cout << "\nTest 3: search existing and missing" << endl;
@@ -60,32 +79,44 @@ int main()
     cout << "\nTest 4: duplicate insert" << endl;
     cout << "Insert duplicate d5 (expected 0): " << dateTree.Insert(d5) << endl;
     cout << "InOrder unchanged: ";
-    dateTree.InOrder();
+    dateTree.InOrder(PrintDate);
     cout << endl;
 
     cout << "\nTest 5: invariant check" << endl;
     cout << "CheckInvariant (expected 1): " << dateTree.CheckInvariant() << endl;
 
+    cout << "\nTest 5a: null callback traversal" << endl;
+    dateTree.InOrder(nullptr);
+    cout << "Null callback completed without crash" << endl;
+
+    cout << "\nTest 5b: node count using traversal callback" << endl;
+    g_count = 0;
+    dateTree.InOrder(CountDate);
+    cout << "Node count (expected 4): " << g_count << endl;
+
     cout << "\nTest 6: copy constructor / pass by value" << endl;
     TestByValue(dateTree);
 
-    cout << "\nTest 7: pass by const reference" << endl;
+    cout << "\nTest 7: pass by reference" << endl;
     TestByReference(dateTree);
 
-    cout << "\nTest 8: assignment operator" << endl;
+    cout << "\nTest 8: pass by const reference" << endl;
+    TestByConstReference(dateTree);
+
+    cout << "\nTest 9: assignment operator" << endl;
     Bst<Date> tree2;
     tree2 = dateTree;
     cout << "Assigned tree inorder: ";
-    tree2.InOrder();
+    tree2.InOrder(PrintDate);
     cout << endl;
 
-    cout << "\nTest 9: self-assignment" << endl;
+    cout << "\nTest 10: self-assignment" << endl;
     tree2 = tree2;
     cout << "tree2 after self-assignment: ";
-    tree2.InOrder();
+    tree2.InOrder(PrintDate);
     cout << endl;
 
-    cout << "\nTest 10: deep copy independence" << endl;
+    cout << "\nTest 11: deep copy independence" << endl;
     Bst<Date> tree3;
     tree3.Insert(Date(10, 1, 2020));
     tree3.Insert(Date(5, 1, 2020));
@@ -95,33 +126,33 @@ int main()
     tree3.Clear();
 
     cout << "Original after clear (expected empty): ";
-    tree3.InOrder();
+    tree3.InOrder(PrintDate);
     cout << endl;
 
     cout << "Copied tree should still have values: ";
-    tree4.InOrder();
+    tree4.InOrder(PrintDate);
     cout << endl;
 
-    cout << "\nTest 11: clear" << endl;
+    cout << "\nTest 12: clear" << endl;
     dateTree.Clear();
     cout << "IsEmpty (expected 1): " << dateTree.IsEmpty() << endl;
     cout << "InOrder after clear: ";
-    dateTree.InOrder();
+    dateTree.InOrder(PrintDate);
     cout << endl;
 
-    cout << "\nTest 12: empty traversals" << endl;
+    cout << "\nTest 13: empty traversals" << endl;
     Bst<Date> emptyTree;
     cout << "Empty inorder: ";
-    emptyTree.InOrder();
+    emptyTree.InOrder(PrintDate);
     cout << endl;
     cout << "Empty preorder: ";
-    emptyTree.PreOrder();
+    emptyTree.PreOrder(PrintDate);
     cout << endl;
     cout << "Empty postorder: ";
-    emptyTree.PostOrder();
+    emptyTree.PostOrder(PrintDate);
     cout << endl;
 
-    cout << "\nTest 13: clear empty tree" << endl;
+    cout << "\nTest 14: clear empty tree" << endl;
     emptyTree.Clear();
     cout << "IsEmpty after clear on empty tree (expected 1): " << emptyTree.IsEmpty() << endl;
 
