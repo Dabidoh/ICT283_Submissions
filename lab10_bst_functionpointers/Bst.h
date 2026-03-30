@@ -1,8 +1,6 @@
 #ifndef BST_H
 #define BST_H
 
-#include <iostream>
-
 /**
  * @class Bst
  * @brief A simple recursive binary search tree template.
@@ -11,8 +9,7 @@
  * Duplicate values are not inserted.
  *
  * @tparam T The data type stored in the tree. Type T must support
- * comparison operators <, >, and ==. If traversal output is used,
- * type T must also support the output operator <<.
+ * comparison operators <, >, and ==.
  */
 template <class T>
 class Bst
@@ -56,19 +53,36 @@ public:
     bool Search(const T& value) const;
 
     /**
-     * @brief Outputs tree contents using inorder traversal.
+     * @typedef VisitFunc
+     * @brief Function pointer type used for BST traversal callbacks.
+     *
+     * The function provided will be called for each node visited
+     * during traversal.
      */
-    void InOrder() const;
+    typedef void (*VisitFunc)(const T&);
 
     /**
-     * @brief Outputs tree contents using preorder traversal.
+     * @brief Performs inorder traversal of the BST.
+     *
+     * Calls the provided function for each node in sorted order.
+     *
+     * @param visit Function to call on each node's data.
      */
-    void PreOrder() const;
+    void InOrder(VisitFunc visit) const;
 
     /**
-     * @brief Outputs tree contents using postorder traversal.
+     * @brief Performs preorder traversal of the BST.
+     *
+     * @param visit Function to call on each node's data.
      */
-    void PostOrder() const;
+    void PreOrder(VisitFunc visit) const;
+
+    /**
+     * @brief Performs postorder traversal of the BST.
+     *
+     * @param visit Function to call on each node's data.
+     */
+    void PostOrder(VisitFunc visit) const;
 
     /**
      * @brief Clears the tree.
@@ -90,7 +104,12 @@ public:
 private:
     /**
      * @struct Node
-     * @brief Internal tree node storing one data item and two child pointers.
+     * @brief Represents a single node in the BST.
+     *
+     * Each node contains:
+     * - data value of type T
+     * - pointer to left child
+     * - pointer to right child
      */
     struct Node
     {
@@ -101,16 +120,49 @@ private:
 
     Node* m_root;
 
+    /**
+     * @brief Recursively inserts a value into the BST.
+     */
     Node* Insert(Node* node, const T& value, bool& inserted);
+
+    /**
+     * @brief Recursive search helper.
+     */
     bool Search(const Node* node, const T& value) const;
 
-    void InOrder(const Node* node) const;
-    void PreOrder(const Node* node) const;
-    void PostOrder(const Node* node) const;
-
+    /**
+     * @brief Deletes all nodes in the tree.
+     */
     void DeleteTree(Node* node);
+
+    /**
+     * @brief Creates a deep copy of the tree.
+     */
     Node* CopyTree(const Node* node);
 
+    /**
+     * @brief Recursive helper for inorder traversal.
+     */
+    void InOrder(const Node* node, VisitFunc visit) const;
+
+    /**
+     * @brief Recursive helper for preorder traversal.
+     */
+    void PreOrder(const Node* node, VisitFunc visit) const;
+
+    /**
+     * @brief Recursive helper for postorder traversal.
+     */
+    void PostOrder(const Node* node, VisitFunc visit) const;
+
+    /**
+     * @brief Recursive helper for checking BST ordering.
+     *
+     * @param node Current node being checked.
+     * @param minValue Lower bound value, or nullptr if no lower bound.
+     * @param maxValue Upper bound value, or nullptr if no upper bound.
+     * @return true if the subtree satisfies the BST invariant, false otherwise.
+     */
     bool CheckInvariant(const Node* node, const T* minValue, const T* maxValue) const;
 
 };
@@ -209,54 +261,54 @@ bool Bst<T>::Search(const Node* node, const T& value) const
 }
 
 template <class T>
-void Bst<T>::InOrder() const
+void Bst<T>::InOrder(VisitFunc visit) const
 {
-    InOrder(m_root);
+    if (visit == nullptr) return;
+    InOrder(m_root, visit);
 }
 
 template <class T>
-void Bst<T>::InOrder(const Node* node) const
+void Bst<T>::InOrder(const Node* node, VisitFunc visit) const
 {
-    if (node != nullptr)
-    {
-        InOrder(node->left);
-        std::cout << node->data << ' ';
-        InOrder(node->right);
-    }
+    if (node == nullptr) return;
+
+    InOrder(node->left, visit);
+    visit(node->data);
+    InOrder(node->right, visit);
 }
 
 template <class T>
-void Bst<T>::PreOrder() const
+void Bst<T>::PreOrder(VisitFunc visit) const
 {
-    PreOrder(m_root);
+    if (visit == nullptr) return;
+    PreOrder(m_root, visit);
 }
 
 template <class T>
-void Bst<T>::PreOrder(const Node* node) const
+void Bst<T>::PreOrder(const Node* node, VisitFunc visit) const
 {
-    if (node != nullptr)
-    {
-        std::cout << node->data << ' ';
-        PreOrder(node->left);
-        PreOrder(node->right);
-    }
+    if (node == nullptr) return;
+
+    visit(node->data);
+    PreOrder(node->left, visit);
+    PreOrder(node->right, visit);
 }
 
 template <class T>
-void Bst<T>::PostOrder() const
+void Bst<T>::PostOrder(VisitFunc visit) const
 {
-    PostOrder(m_root);
+    if (visit == nullptr) return;
+    PostOrder(m_root, visit);
 }
 
 template <class T>
-void Bst<T>::PostOrder(const Node* node) const
+void Bst<T>::PostOrder(const Node* node, VisitFunc visit) const
 {
-    if (node != nullptr)
-    {
-        PostOrder(node->left);
-        PostOrder(node->right);
-        std::cout << node->data << ' ';
-    }
+    if (node == nullptr) return;
+
+    PostOrder(node->left, visit);
+    PostOrder(node->right, visit);
+    visit(node->data);
 }
 
 template <class T>
