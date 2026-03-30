@@ -1,0 +1,27 @@
+# depslib dependency file v1.0
+1773579227 source:d:\downloads\lab9_submission_datasource\date.cpp
+	"Date.h"
+
+1773579199 d:\downloads\lab9_submission_datasource\date.h
+	<iostream>
+
+1773586232 source:d:\downloads\lab9_submission_datasource\datetreeloader.cpp
+	"DateTreeLoader.h"
+	<fstream>
+	<sstream>
+	<iostream>
+
+1773585827 d:\downloads\lab9_submission_datasource\datetreeloader.h
+	<string>
+	<iosfwd>
+	"Bst.h"
+	"Date.h"
+
+1773584941 d:\downloads\lab9_submission_datasource\bst.h
+	<iostream>
+
+1773579237 source:d:\downloads\lab9_submission_datasource\testbstdate.cpp
+	<iostream>
+	"Bst.h"
+	"Date.h"
+
