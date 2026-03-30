@@ -1,64 +1,63 @@
 #include <iostream>
-#include "Bst.h"
-#include "Date.h"
-#include "DateTreeLoader.h"
+#include <iomanip>
+#include "WeatherLog.h"
 
+using std::cin;
 using std::cout;
 using std::endl;
 
-static void PrintDate(const Date& d)
+static const char* MonthName(int month)
 {
-    std::cout << d << ' ';
-}
+    static const char* MONTH_NAMES[] =
+    {
+        "",
+        "January", "February", "March", "April",
+        "May", "June", "July", "August",
+        "September", "October", "November", "December"
+    };
 
-static void TestByValue(Bst<Date> tree)
-{
-    cout << "Pass-by-value inorder: ";
-    tree.InOrder(PrintDate);
-    cout << endl;
-}
+    if (month < 1 || month > 12)
+    {
+        return "Invalid";
+    }
 
-static void TestByReference(const Bst<Date>& tree)
-{
-    cout << "Pass-by-reference inorder: ";
-    tree.InOrder(PrintDate);
-    cout << endl;
+    return MONTH_NAMES[month];
 }
 
 int main()
 {
-    Bst<Date> dateTree;
+    WeatherLog log;
 
-    DateLoadReport report =
-        LoadDatesFromDataSource("data/data_source.txt", dateTree, cout);
+    if (!log.LoadData("data/data_source.txt"))
+    {
+        cout << "Error: failed to load data." << endl;
+        return 1;
+    }
 
-    cout << "\n===== Load Report =====" << endl;
-    cout << "Files opened: " << report.filesOpened << endl;
-    cout << "Files failed: " << report.filesFailed << endl;
-    cout << "Rows read: " << report.rowsRead << endl;
-    cout << "Dates inserted: " << report.datesInserted << endl;
-    cout << "Duplicates rejected: " << report.duplicatesRejected << endl;
-    cout << "Invalid rows: " << report.invalidRows << endl;
+    int month = 0;
+    cout << "Enter month (1-12): ";
+    cin >> month;
 
-    cout << "\nInOrder (chronological): ";
-    dateTree.InOrder(PrintDate);
-    cout << endl;
+    if (month < 1 || month > 12)
+    {
+        cout << "Error: invalid month." << endl;
+        return 1;
+    }
 
-    cout << "PreOrder: ";
-    dateTree.PreOrder(PrintDate);
-    cout << endl;
+    if (!log.HasMonth(month))
+    {
+        cout << "No data for " << MonthName(month) << endl;
+        return 0;
+    }
 
-    cout << "PostOrder: ";
-    dateTree.PostOrder(PrintDate);
-    cout << endl;
+    cout << std::fixed << std::setprecision(6);
 
-    cout << "\nBST invariant holds: " << dateTree.CheckInvariant() << endl;
+    cout << "Sample Pearson Correlation Coefficient for "
+         << MonthName(month) << endl;
 
-    cout << "Search 30/6/2016: " << dateTree.Search(Date(30, 6, 2016)) << endl;
-    cout << "Search 1/1/2099: " << dateTree.Search(Date(1, 1, 2099)) << endl;
-
-    TestByValue(dateTree);
-    TestByReference(dateTree);
+    cout << "S_T: " << log.CalculateCorrelationST(month) << endl;
+    cout << "S_R: " << log.CalculateCorrelationSR(month) << endl;
+    cout << "T_R: " << log.CalculateCorrelationTR(month) << endl;
 
     return 0;
 }
